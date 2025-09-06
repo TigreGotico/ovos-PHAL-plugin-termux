@@ -20,7 +20,7 @@ class TermuxVolumeControlPlugin(PHALPlugin):
 
     def __init__(self, bus=None, config=None):
         super().__init__(bus=bus, name="ovos-PHAL-plugin-termux", config=config)
-        self.termux = TermuxControl()
+        self.termux = TermuxControl(stream=self.config.get("stream", "music"))
         self.bus.on("mycroft.volume.get", self.handle_volume_request)
         self.bus.on("mycroft.volume.set", self.handle_volume_change)
         self.bus.on("mycroft.volume.increase", self.handle_volume_increase)

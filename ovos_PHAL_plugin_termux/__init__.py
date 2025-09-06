@@ -148,12 +148,14 @@ class TermuxControl:
         self._volume = 0
         self.max_vol = self.get_streams()[stream]["max_volume"]
         self.muted = False
+        self.get_volume() # initial sync
 
     @staticmethod
     def get_streams():
         out = subprocess.check_output("termux-volume").decode("utf-8")
         streams = {e["stream"]: {"volume": e["volume"], "max_volume": e["max_volume"]}
                    for e in json.loads(out)}
+        LOG.debug(f"volume info: {streams}")
         return streams
 
     def is_muted(self):

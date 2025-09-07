@@ -10,6 +10,21 @@ self.bus.on("mycroft.volume.set", self.handle_volume_change)
 self.bus.on("mycroft.volume.mute", self.handle_mute_request)
 self.bus.on("mycroft.volume.unmute", self.handle_unmute_request)
 ```
+---
+
+### Config
+
+```json
+  "PHAL": {
+    "ovos-PHAL-plugin-termux": {
+      "stream": "music",
+      "vibrate_on_record_start": false,
+      "vibrate_on_record_end": false,
+      "vibrate_on_sleep": false,
+      "vibrate_on_error": true
+    }
+  }
+```
 
 ---
 

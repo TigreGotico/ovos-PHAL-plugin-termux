@@ -28,6 +28,27 @@ class TermuxVolumeControlPlugin(PHALPlugin):
         self.bus.on("mycroft.volume.mute", self.handle_mute_request)
         self.bus.on("mycroft.volume.unmute", self.handle_unmute_request)
         self.bus.on("mycroft.volume.mute.toggle", self.handle_mute_toggle_request)
+        self.bus.on("recognizer_loop:record_begin", self.handle_record_start)
+        self.bus.on("recognizer_loop:record_end", self.handle_record_end)
+        self.bus.on("recognizer_loop:sleep", self.handle_sleep)
+        self.bus.on("recognizer_loop:speech.recognition.unknown", self.handle_error)
+        self.bus.on("complete_intent_failure", self.handle_error)
+
+    def handle_record_start(self):
+        if self.config.get("vibrate_on_record_start"):
+            subprocess.call("termux-vibrate")
+
+    def handle_record_end(self):
+        if self.config.get("vibrate_on_record_end"):
+            subprocess.call("termux-vibrate")
+
+    def handle_sleep(self):
+        if self.config.get("vibrate_on_sleep"):
+            subprocess.call("termux-vibrate")
+
+    def handle_error(self):
+        if self.config.get("vibrate_on_error", True):
+            subprocess.call("termux-vibrate")
 
     def get_volume(self):
         return self.termux.get_volume_percent()
@@ -179,7 +200,7 @@ class TermuxControl:
         volume = min(volume, self.max_vol)
         self._volume = volume
         self.muted = volume == 0
-        subprocess.check_output(["termux-volume", self.stream, str(volume)])
+        subprocess.call(["termux-volume", self.stream, str(volume)])
 
     def get_volume_percent(self):
         vol = self.get_volume()

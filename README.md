@@ -18,6 +18,7 @@ self.bus.on("mycroft.volume.unmute", self.handle_unmute_request)
   "PHAL": {
     "ovos-PHAL-plugin-termux": {
       "stream": "music",
+      "camera_id": 0,
       "vibrate_on_record_start": false,
       "vibrate_on_record_end": false,
       "vibrate_on_sleep": false,

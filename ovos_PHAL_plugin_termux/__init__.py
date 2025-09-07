@@ -68,7 +68,9 @@ class TermuxPlugin(PHALPlugin):
         # send data b64 encoded instead
         else:
             pic_path = os.path.expanduser("~/.termux_camera.png")
-            subprocess.call(["termux-camera-photo", pic_path])
+            subprocess.call(["termux-camera-photo",
+                             "-c", str(self.config.get("camera_id", 0)),
+                             pic_path])
             with open(pic_path, "rb") as f:
                 frame = f.read()
             self.bus.emit(message.response({"b64_frame": base64.b64encode(frame).decode('utf-8')}))

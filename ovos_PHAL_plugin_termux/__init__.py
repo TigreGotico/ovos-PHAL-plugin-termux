@@ -172,14 +172,14 @@ class TermuxControl:
         self.set_volume_percent(max(volume, 0))
 
     def get_volume(self):
-        self._volume = self.get_streams(self.stream)["volume"]
+        self._volume = self.get_streams()[self.stream]["volume"]
         return self._volume
 
     def set_volume(self, volume):
         volume = min(volume, self.max_vol)
         self._volume = volume
         self.muted = volume == 0
-        subprocess.check_output(["termux-volume", self.stream, volume])
+        subprocess.check_output(["termux-volume", self.stream, str(volume)])
 
     def get_volume_percent(self):
         vol = self.get_volume()

@@ -197,7 +197,7 @@ class TermuxControl:
         return self._volume
 
     def set_volume(self, volume):
-        volume = min(volume, self.max_vol)
+        volume = int(min(volume, self.max_vol))
         self._volume = volume
         self.muted = volume == 0
         subprocess.call(["termux-volume", self.stream, str(volume)])

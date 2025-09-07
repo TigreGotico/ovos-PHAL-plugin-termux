@@ -1,12 +1,12 @@
-from ovos_plugin_manager.phal import PHALPlugin
-from ovos_utils.log import LOG
+import base64
+import json
+import os
+import subprocess
+
 from ovos_bus_client import Message
 from ovos_bus_client.session import SessionManager
-from ovos_utils.system import find_executable, is_process_running
-from ovos_plugin_manager.phal import find_phal_plugins
-
-import subprocess
-import json
+from ovos_plugin_manager.phal import PHALPlugin
+from ovos_utils.log import LOG
 
 
 class TermuxValidator:
@@ -15,7 +15,7 @@ class TermuxValidator:
         return True
 
 
-class TermuxVolumeControlPlugin(PHALPlugin):
+class TermuxPlugin(PHALPlugin):
     validator = TermuxValidator
 
     def __init__(self, bus=None, config=None):
@@ -33,6 +33,46 @@ class TermuxVolumeControlPlugin(PHALPlugin):
         self.bus.on("recognizer_loop:sleep", self.handle_sleep)
         self.bus.on("recognizer_loop:speech.recognition.unknown", self.handle_error)
         self.bus.on("complete_intent_failure", self.handle_error)
+
+        self.bus.on("ovos.phal.camera.ping", self.handle_camera_pong)
+        self.bus.on("ovos.phal.camera.get", self.handle_camera_picture)
+
+        # let the system know we have a camera
+        self.bus.emit(Message("ovos.phal.camera.pong"))
+
+    def handle_camera_pong(self, message: Message) -> None:
+        """
+        Let OVOS know camera is available
+
+        Args:
+            message (Message): The incoming message.
+        """
+        if self.validate_message_context(message):
+            self.bus.emit(message.reply("ovos.phal.camera.pong"))
+
+    def handle_camera_picture(self, message: Message) -> None:
+        """
+        Handle the "take picture" message.
+
+        Args:
+            message (Message): The incoming message.
+        """
+        if not self.validate_message_context(message):
+            return
+
+        pic_path = message.data.get("path")
+        if pic_path:
+            pic_path = os.path.expanduser(pic_path)
+            os.makedirs(os.path.dirname(pic_path), exist_ok=True)
+            subprocess.call(["termux-camera-photo", pic_path])
+        # send data b64 encoded instead
+        else:
+            pic_path = os.path.expanduser("~/.termux_camera.png")
+            subprocess.call(["termux-camera-photo", pic_path])
+            with open(pic_path, "rb") as f:
+                frame = f.read()
+            self.bus.emit(message.response({"b64_frame": base64.b64encode(frame).decode('utf-8')}))
+            os.remove(pic_path)
 
     def handle_record_start(self):
         if self.config.get("vibrate_on_record_start"):

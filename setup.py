@@ -55,11 +55,11 @@ def get_description():
     return long_description
 
 
-PLUGIN_ENTRY_POINT = 'ovos-PHAL-plugin-termux=ovos_PHAL_plugin_termux:TermuxVolumeControlPlugin'
+PLUGIN_ENTRY_POINT = 'ovos-PHAL-plugin-termux=ovos_PHAL_plugin_termux:TermuxPlugin'
 setup(
     name='ovos-PHAL-plugin-termux',
     version=get_version(),
-    description='A volume control plugin for OpenVoiceOS hardware abstraction layer',
+    description='A termux plugin for OpenVoiceOS hardware abstraction layer',
     long_description=get_description(),
     long_description_content_type="text/markdown",
     url='https://github.com/OpenVoiceOS/ovos-PHAL-plugin-termux',

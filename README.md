@@ -1,8 +1,20 @@
-# ovos-PHAL-plugin - termux volume control
+# ovos-PHAL-plugin-termux
 
-controls system volume with termux
+A PHAL plugin that controls system volume, vibration, and the camera on Termux. It runs as part of the [Platform/Hardware Abstraction Layer](https://github.com/OpenVoiceOS/ovos-PHAL) in OpenVoiceOS.
 
-for voice control you need the companion [ovos-skill-volume](https://github.com/OpenVoiceOS/ovos-skill-volume)
+The plugin listens for OVOS bus messages and translates them into `termux-api` calls, so volume and camera commands work on an Android device running Termux.
+
+For voice control of volume, use the companion [ovos-skill-volume](https://github.com/OpenVoiceOS/ovos-skill-volume).
+
+## Install
+
+```bash
+pip install ovos-PHAL-plugin-termux
+```
+
+## Usage
+
+OVOS loads this plugin as a PHAL entry point. It handles these bus messages:
 
 ```python
 self.bus.on("mycroft.volume.get", self.handle_volume_request)
@@ -10,7 +22,8 @@ self.bus.on("mycroft.volume.set", self.handle_volume_change)
 self.bus.on("mycroft.volume.mute", self.handle_mute_request)
 self.bus.on("mycroft.volume.unmute", self.handle_unmute_request)
 ```
----
+
+It also handles camera messages (`ovos.phal.camera.ping`, `ovos.phal.camera.get`) and can vibrate the device on record start, record end, sleep, and error events.
 
 ### Config
 
@@ -27,14 +40,21 @@ self.bus.on("mycroft.volume.unmute", self.handle_unmute_request)
   }
 ```
 
----
+## HiveMind support
 
-## HiveMind Support
+This plugin works with OVOS and with [HiveMind](https://github.com/JarbasHiveMind) satellites.
 
-This plugin can be used both in OVOS and with [HiveMind](https://github.com/JarbasHiveMind) satellites.
-
-Be sure to allow `"mycroft.volume.get.response"` in your hivemind for your satellite to be able to report volume
+Allow `mycroft.volume.get.response` in your HiveMind setup, so your satellite can report volume:
 
 ```bash
 hivemind-core allow-msg "mycroft.volume.get.response"
 ```
+
+## Related projects
+
+- [ovos-PHAL](https://github.com/OpenVoiceOS/ovos-PHAL) - the plugin host this plugin registers with
+- [ovos-skill-volume](https://github.com/OpenVoiceOS/ovos-skill-volume) - the skill that drives volume control through voice
+
+## License
+
+[Apache License 2.0](LICENSE)
